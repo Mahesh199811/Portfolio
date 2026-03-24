@@ -1,7 +1,0 @@
-services:
-  frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
-    ports:
-      - "80:80"
