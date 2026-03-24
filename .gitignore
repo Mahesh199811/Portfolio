@@ -1,0 +1,36 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.swp
+appsettings.Development.json
+
+# Docker
+.docker/
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+!terraform.tfvars.example
+.terraform.lock.hcl
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Node (if any)
+node_modules/
+npm-debug.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/settings.json

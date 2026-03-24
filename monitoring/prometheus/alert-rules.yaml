@@ -1,0 +1,46 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: portfolio-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: portfolio.backend
+      rules:
+        - alert: BackendDown
+          expr: up{job="portfolio-backend"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Portfolio backend is down"
+            description: "Backend pod has been down for more than 1 minute."
+
+        - alert: HighErrorRate
+          expr: rate(http_requests_received_total{status=~"5.."}[5m]) > 0.1
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High HTTP error rate on backend"
+            description: "More than 10% of requests are returning 5xx errors."
+
+        - alert: HighResponseTime
+          expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High API response time"
+            description: "95th percentile response time is above 2 seconds."
+
+        - alert: PodCrashLooping
+          expr: rate(kube_pod_container_status_restarts_total{namespace="portfolio"}[15m]) > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Pod is crash-looping"
+            description: "Pod {{ $labels.pod }} in namespace portfolio is restarting frequently."

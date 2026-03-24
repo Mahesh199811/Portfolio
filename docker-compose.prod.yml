@@ -1,0 +1,6 @@
+services:
+  frontend:
+    image: ${ECR_REGISTRY}/portfolio-frontend:${IMAGE_TAG}
+    ports:
+      - "80:80"
+    restart: always

@@ -1,0 +1,50 @@
+# Frontend
+frontend:
+  image: portfolio-frontend:latest
+  replicas: 2
+  port: 80
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "64Mi"
+    limits:
+      cpu: "200m"
+      memory: "128Mi"
+
+# Backend
+backend:
+  image: portfolio-backend:latest
+  replicas: 2
+  port: 5000
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+  env:
+    DB_HOST: ""
+    DB_NAME: "portfolio_db"
+    DB_USER: "postgres"
+    DB_PASSWORD: ""
+    SES_FROM_EMAIL: "maheshgadhave82@gmail.com"
+    SES_TO_EMAIL: "maheshgadhave82@gmail.com"
+
+# Ingress
+ingress:
+  enabled: true
+  class: alb
+  scheme: internet-facing
+
+# HPA
+hpa:
+  enabled: true
+  backend:
+    minReplicas: 2
+    maxReplicas: 6
+    cpuTargetUtilization: 70
+  frontend:
+    minReplicas: 2
+    maxReplicas: 4
+    cpuTargetUtilization: 70
