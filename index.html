@@ -569,6 +569,35 @@
         </div>
       </div>
 
+      <!-- Project 5 -->
+      <div class="glass-card project-card reveal">
+        <div class="project-header">
+          <div class="project-icon blue"><i class="fas fa-network-wired"></i></div>
+          <div class="project-links"></div>
+        </div>
+        <h3 class="project-title">AWS VPC with Jenkins and Private App Server</h3>
+        <p class="project-desc">
+          Created a custom VPC and split it into public and private subnets to isolate internet-facing
+          and internal workloads. Attached an Internet Gateway for the public subnet, added a NAT Gateway
+          for safe outbound access from the private subnet, and configured route tables so public traffic
+          flows through the IGW while private traffic routes through NAT. Secured the environment with
+          Security Groups: the Jenkins server in the public subnet allows SSH only from my IP and Jenkins
+          UI on port 8080, while the private app server accepts SSH only from Jenkins using a bastion-style
+          access pattern. Launched two EC2 instances, verified connectivity using Linux networking commands,
+          and installed Java, Jenkins, Docker, Git, AWS CLI, kubectl, and Terraform on the Jenkins host.
+        </p>
+        <div class="project-tech">
+          <span class="tech-tag">AWS EC2</span>
+          <span class="tech-tag">VPC</span>
+          <span class="tech-tag">Public/Private Subnets</span>
+          <span class="tech-tag">Internet Gateway</span>
+          <span class="tech-tag">NAT Gateway</span>
+          <span class="tech-tag">Route Tables</span>
+          <span class="tech-tag">Security Groups</span>
+          <span class="tech-tag">Jenkins</span>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
