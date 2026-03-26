@@ -324,12 +324,168 @@ document.querySelectorAll('.skill-category-card').forEach(card => {
   skillBarObserver.observe(card);
 });
 
+
+/* ============================
+   8. RESUME DOWNLOAD (WORD)
+============================ */
+function cleanText(value) {
+  return (value || '').replace(/\s+/g, ' ').trim();
+}
+
+function safeText(value) {
+  return cleanText(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function getContactValue(label) {
+  const items = Array.from(document.querySelectorAll('.contact-detail-item'));
+  const found = items.find((item) => {
+    const currentLabel = cleanText(item.querySelector('.label')?.textContent).toLowerCase();
+    return currentLabel === label.toLowerCase();
+  });
+
+  return cleanText(found?.querySelector('.value')?.textContent || '');
+}
+
+function buildResumeWordHtml() {
+  const fullName = cleanText(document.querySelector('.hero-name')?.textContent) || 'Mahesh Gadhave';
+  const summary = cleanText(document.querySelector('.hero-desc')?.textContent) || 'DevOps & AWS-focused engineer with hands-on experience in CI/CD, containers, and cloud automation.';
+  const role = cleanText(document.querySelector('.hero-role-wrapper')?.textContent) || 'DevOps & AWS-focused Engineer';
+
+  const email = getContactValue('Email');
+  const phone = getContactValue('Phone');
+  const location = getContactValue('Location');
+  const linkedin = document.querySelector('a[title="LinkedIn"]')?.getAttribute('href') || '';
+
+  const skillSet = Array.from(document.querySelectorAll('.skill-name'))
+    .map((el) => safeText(el.textContent))
+    .filter(Boolean);
+
+  const projects = Array.from(document.querySelectorAll('.project-card')).map((card) => {
+    const title = safeText(card.querySelector('.project-title')?.textContent);
+    const desc = safeText(card.querySelector('.project-desc')?.textContent);
+    const tech = Array.from(card.querySelectorAll('.tech-tag'))
+      .map((tag) => safeText(tag.textContent))
+      .filter(Boolean)
+      .join(', ');
+
+    return { title, desc, tech };
+  });
+
+  const experiences = Array.from(document.querySelectorAll('.timeline-item')).map((item) => {
+    const period = safeText(item.querySelector('.tl-period')?.textContent);
+    const mode = safeText(item.querySelector('.tl-company')?.textContent);
+    const roleName = safeText(item.querySelector('.tl-role')?.textContent);
+    const company = safeText(item.querySelector('.tl-company-name')?.textContent);
+    const desc = safeText(item.querySelector('.tl-desc')?.textContent);
+    const bullets = Array.from(item.querySelectorAll('.tl-bullets li'))
+      .map((li) => `<li>${safeText(li.textContent)}</li>`)
+      .join('');
+
+    return { period, mode, roleName, company, desc, bullets };
+  });
+
+  const educationTitle = safeText(document.querySelector('section .fa-graduation-cap')?.closest('div')?.nextElementSibling?.querySelector('div')?.textContent || 'Bachelor of Engineering (B.E.)');
+  const educationMeta = safeText(document.querySelector('section .fa-graduation-cap')?.closest('div')?.nextElementSibling?.querySelectorAll('div')?.[1]?.textContent || 'RTMNU, Nagpur · 2020');
+  const educationScore = safeText(document.querySelector('section .fa-graduation-cap')?.closest('div')?.nextElementSibling?.querySelectorAll('div')?.[2]?.textContent || 'CGPA: 7.38');
+
+  return `<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+  <meta charset="utf-8">
+  <title>${safeText(fullName)} - Resume</title>
+  <style>
+    body { font-family: Calibri, Arial, sans-serif; color: #111; margin: 30px; line-height: 1.45; }
+    h1 { font-size: 28px; margin: 0 0 4px; }
+    h2 { font-size: 16px; margin: 18px 0 8px; border-bottom: 1px solid #dcdcdc; padding-bottom: 4px; text-transform: uppercase; letter-spacing: 0.6px; }
+    h3 { font-size: 14px; margin: 0 0 4px; }
+    p { margin: 0 0 10px; }
+    ul { margin: 6px 0 10px 18px; }
+    li { margin: 2px 0; }
+    .headline { font-size: 13px; color: #2b2b2b; margin-bottom: 8px; }
+    .contact { font-size: 12px; color: #333; margin-bottom: 14px; }
+    .row { margin-bottom: 12px; }
+    .meta { color: #444; font-size: 12px; margin-bottom: 4px; }
+    .chips { font-size: 12px; }
+    .project { margin-bottom: 12px; }
+    .project-tech { font-size: 12px; color: #333; }
+  </style>
+</head>
+<body>
+  <h1>${safeText(fullName)}</h1>
+  <div class="headline">${safeText(role)}</div>
+  <div class="contact">
+    ${safeText(email)} | ${safeText(phone)} | ${safeText(location)}${linkedin ? ` | LinkedIn: ${safeText(linkedin)}` : ''}
+  </div>
+
+  <h2>Professional Summary</h2>
+  <p>${safeText(summary)}</p>
+
+  <h2>Skills</h2>
+  <p class="chips">${skillSet.join(' • ')}</p>
+
+  <h2>Experience</h2>
+  ${experiences.map((exp) => `
+    <div class="row">
+      <h3>${exp.roleName}</h3>
+      <div class="meta">${exp.company} | ${exp.period}${exp.mode ? ` | ${exp.mode}` : ''}</div>
+      <p>${exp.desc}</p>
+      <ul>${exp.bullets}</ul>
+    </div>
+  `).join('')}
+
+  <h2>Projects</h2>
+  ${projects.map((project) => `
+    <div class="project">
+      <h3>${project.title}</h3>
+      <p>${project.desc}</p>
+      <div class="project-tech"><strong>Tech:</strong> ${project.tech}</div>
+    </div>
+  `).join('')}
+
+  <h2>Education</h2>
+  <div class="row">
+    <h3>${educationTitle}</h3>
+    <div class="meta">${educationMeta}</div>
+    <p>${educationScore}</p>
+  </div>
+</body>
+</html>`;
+}
+
+function downloadResumeAsWord() {
+  const wordHtml = buildResumeWordHtml();
+  const blob = new Blob(['\ufeff', wordHtml], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = 'Mahesh_Gadhave_Resume.doc';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+}
+
+const downloadResumeBtn = document.getElementById('download-resume-btn');
+if (downloadResumeBtn) {
+  downloadResumeBtn.addEventListener('click', downloadResumeAsWord);
+}
+
 /* ============================
    9. SMOOTH ACTIVE STATE FOR NAV
 ============================ */
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   anchor.addEventListener('click', function(e) {
-    const target = document.querySelector(this.getAttribute('href'));
+    const href = this.getAttribute('href');
+    if (!href || href === '#') return;
+
+    const target = document.querySelector(href);
     if (target) {
       e.preventDefault();
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
